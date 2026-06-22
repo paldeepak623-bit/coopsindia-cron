@@ -1,10 +1,8 @@
 ﻿name: CoopsIndia Cron Trigger
 on:
   schedule:
-    - cron: "15 8 * * *"
     - cron: "30 3 * * *"
     - cron: "35 3 * * *"
-    - cron: "5 4 * * *"
   workflow_dispatch:
 jobs:
   trigger:
