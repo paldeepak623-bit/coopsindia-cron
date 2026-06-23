@@ -1,0 +1,29 @@
+name: CoopsIndia Cron Every 5min
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+jobs:
+  maybe-trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger at 7:00-7:04 AM IST only
+        env:
+          GH_TOKEN: ${{ secrets.COOPS_CRON_TOKEN }}
+        run: |
+          H=$(TZ=Asia/Kolkata date +%H)
+          M=$(TZ=Asia/Kolkata date +%M)
+          echo "IST: $(TZ=Asia/Kolkata date)"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual — trigger now"
+          elif [ "$H" != "07" ] || [ "$M" -ge 5 ]; then
+            echo "Not 7 AM window — exit"
+            exit 0
+          fi
+          curl -fsS -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/paldeepak623-bit/coopsindia-daily-automation/dispatches \
+            -d '{"event_type":"coops-daily-run"}'
